@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCHIVE v3 - Новый год</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#000;color:#fff;overflow-x:hidden;position:relative;}
+header{padding:40px 0;text-align:center;border-bottom:2px solid #111;position:relative;z-index:10;}
+header h1{font-size:55px;letter-spacing:15px;text-shadow:0 0 20px #900;}
+nav{margin-top:25px;display:flex;gap:50px;justify-content:center;}
+nav a{color:#aaa;text-decoration:none;font-size:18px;transition:.3s;}
+nav a:hover{color:#fff;text-shadow:0 0 10px #f00;}
+section{width:90%;max-width:1200px;margin:auto;padding:80px 0;border-bottom:1px solid #111;position:relative;z-index:5;}
+.frame{border:2px solid #222;padding:25px;background:#050505;transition:.4s;}
+.frame:hover{border-color:#f00;box-shadow:0 0 25px #600;}
+.article{border-bottom:1px solid #111;padding:20px 10px;cursor:pointer;transition:.3s;display:flex;justify-content:space-between;align-items:center;}
+.article:hover{color:#f00;}
+#adminPanel{display:none;border:2px solid #f00;padding:20px;margin-top:40px;}
+.shop-item{border:2px solid #222;padding:25px;margin:20px 0;background:#070707;transition:.3s;}
+.shop-item:hover{border-color:#f00;transform:scale(1.02);}
+#modal{display:none;justify-content:center;align-items:center;position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);padding:20px;z-index:1000;}
+#modalBox{background:#111;padding:30px;max-width:800px;width:90%;border:2px solid #444;overflow-y:auto;max-height:90%;}
+#musicBtn{position:fixed;right:20px;bottom:20px;background:#900;color:#fff;border:none;padding:12px 20px;cursor:pointer;z-index:999;}
+input,textarea{width:100%;margin-top:10px;margin-bottom:10px;padding:10px;background:#181818;color:#fff;border:1px solid #444;}
+button{padding:10px 20px;background:#900;border:none;color:#fff;cursor:pointer;transition:.3s;}
+button:hover{background:#f00;}
+.chat-box{border:1px solid #222;padding:10px;background:#070707;height:300px;overflow-y:auto;margin-bottom:10px;}
+.msg{margin-bottom:8px;}
+#langToggle{position:absolute;right:20px;top:20px;cursor:pointer;color:#666;}
+#langToggle:hover{color:#fff;}
+
+/* Снег */
+.snowflake {
+    position:fixed;
+    top:-50px;
+    color:white;
+    font-size:20px;
+    pointer-events:none;
+    user-select:none;
+    z-index:9999;
+    animation-name:fall, sway;
+    animation-timing-function:linear, ease-in-out;
+    animation-iteration-count:infinite;
+}
+@keyframes fall {0%{transform:translateY(-50px);} 100%{transform:translateY(110vh);}}
+@keyframes sway {0%{transform:translateX(0);} 50%{transform:translateX(20px);} 100%{transform:translateX(0);}}
+
+/* Дед Мороз */
+#santa {
+    position:fixed;
+    top:20%;
+    z-index:9999;
+    width:120px;
+    height:auto;
+    object-fit:contain;
+}
+
+/* Гирлянда */
+.garland {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:20px;
+    display:flex;
+    justify-content:space-around;
+    z-index:9998;
+}
+.light {
+    width:15px; height:15px;
+    border-radius:50%;
+    animation:blink 1.5s infinite alternate;
+}
+.light:nth-child(1){background:red; animation-delay:0s;}
+.light:nth-child(2){background:yellow; animation-delay:0.3s;}
+.light:nth-child(3){background:green; animation-delay:0.6s;}
+.light:nth-child(4){background:blue; animation-delay:0.9s;}
+.light:nth-child(5){background:purple; animation-delay:1.2s;}
+@keyframes blink {0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+</style>
+</head>
+<body>
+
+<!-- Гирлянда -->
+<div class="garland">
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+</div>
+
+<!-- Снег -->
+<div id="snow"></div>
+
+<!-- Дед Мороз -->
+<img id="santa" src="https://i.pinimg.com/originals/97/4a/38/974a38c4dfc8a2bb2ca85c97f58c2805.gif" alt="Дед Мороз">
+
+<audio id="music" loop autoplay>
+<source src="https://files.catbox.moe/w0i7xr.mp3">
+</audio>
+<button id="musicBtn" onclick="toggleMusic()">Музыка: ON</button>
+
+<header>
+<h1>ARCHIVE</h1>
+<div id="langToggle" onclick="toggleLang()">RU/EN</div>
+<nav>
+<a href="#articles">Статьи</a>
+<a href="#shop">Магазин</a>
+<a href="#chat">Чат</a>
+<a href="#" onclick="adminLogin()">Админ</a>
+</nav>
+</header>
+
+<section>
+<div class="frame">
+<h2>Тёмный архив разоблачений</h2>
+<p>Материалы можно публиковать и просматривать.</p>
+</div>
+</section>
+
+<section id="articles">
+<h2 style="text-align:center;margin-bottom:40px;">СТАТЬИ</h2>
+<div id="articleList"></div>
+</section>
+
+<section>
+<div id="adminPanel">
+<h2>Добавить статью</h2>
+<input id="title" placeholder="Заголовок">
+<textarea id="content" placeholder="Содержимое"></textarea>
+<button onclick="addArticle()">Опубликовать</button>
+</div>
+</section>
+
+<section id="shop">
+<h2 style="text-align:center;margin-bottom:30px;">МАГАЗИН</h2>
+<div class="shop-item">
+<h3>Пиар в ARCHIVE — 40$</h3>
+<button onclick="window.location.href='https://t.me/klshdead'">Купить</button>
+</div>
+<div class="shop-item">
+<h3>Деф/защита — 50$</h3>
+<button onclick="window.location.href='https://t.me/klshdead'">Купить</button>
+</div>
+<div class="shop-item">
+<h3>Работа с нами — 30$</h3>
+<button onclick="window.location.href='https://t.me/klshdead'">Купить</button>
+</div>
+</section>
+
+<section id="chat">
+<h2 style="text-align:center;margin-bottom:20px;">Чат</h2>
+<div class="chat-box" id="chatBox"></div>
+<input id="chatInput" placeholder="Сообщение">
+<button onclick="sendMsg()">Отправить</button>
+</section>
+
+<div id="modal" onclick="closeModal()">
+<div id="modalBox" onclick="event.stopPropagation()">
+<h2 id="mTitle"></h2>
+<p id="mText" style="margin-top:20px;line-height:24px;"></p>
+</div>
+</div>
+
+<script>
+// MUSIC
+let music=document.getElementById("music");
+let musicBtn=document.getElementById("musicBtn");
+function toggleMusic(){if(music.paused){music.play();musicBtn.textContent="Музыка: ON";}else{music.pause();musicBtn.textContent="Музыка: OFF";}}
+
+// LANG
+let lang="RU";
+function toggleLang(){
+lang=lang==="RU"?"EN":"RU";
+document.querySelectorAll("h2,h3,p,button").forEach(e=>{
+if(lang==="EN"){e.innerHTML=e.getAttribute("data-en")||e.innerHTML;}
+else{e.innerHTML=e.getAttribute("data-ru")||e.innerHTML;}
+});
+}
+
+// ADMIN LOGIN
+let admin=false;
+function adminLogin(){
+let p=prompt("Пароль:");
+if(p==="archive666"){document.getElementById("adminPanel").style.display="block";window.location="#admin"; admin=true; renderArticles();}
+else {alert("Неверный пароль"); admin=false;}
+}
+
+// ARTICLES
+let articles=JSON.parse(localStorage.getItem("articles")||"[]");
+renderArticles();
+function renderArticles(){
+let box=document.getElementById("articleList");
+box.innerHTML="";
+articles.forEach((x,i)=>{
+let div=document.createElement("div");
+div.className="article";
+div.innerHTML=`<span>${x.title}</span>`;
+if(admin){
+    let btn=document.createElement("button");
+    btn.textContent="Удалить";
+    btn.style.background="#900";
+    btn.style.marginLeft="10px";
+    btn.onclick=()=>{
+        if(confirm("Удалить статью?")){
+            articles.splice(i,1);
+            localStorage.setItem("articles",JSON.stringify(articles));
+            renderArticles();
+        }
+    };
+    div.appendChild(btn);
+}
+div.onclick=()=>openArticle(i);
+box.appendChild(div);
+});
+}
+
+// ADD ARTICLE
+function addArticle(){
+let t=document.getElementById("title").value;
+let c=document.getElementById("content").value;
+if(t.length<1||c.length<1)return;
+articles.unshift({title:t,content:c});
+localStorage.setItem("articles",JSON.stringify(articles));
+renderArticles();
+alert("Опубликовано!");
+}
+
+// VIEW ARTICLE
+function openArticle(i){
+let a=articles[i];
+document.getElementById("mTitle").textContent=a.title;
+document.getElementById("mText").textContent=a.content;
+document.getElementById("modal").style.display="flex";
+}
+
+// CLOSE MODAL
+function closeModal(){document.getElementById("modal").style.display="none";}
+
+// CHAT
+let chat=JSON.parse(localStorage.getItem("chat")||"[]");
+function renderChat(){let b=document.getElementById("chatBox");b.innerHTML="";chat.forEach(m=>{let d=document.createElement("div");d.className="msg";d.textContent=m; b.appendChild(d);});b.scrollTop=b.scrollHeight;}
+renderChat();
+function sendMsg(){let v=document.getElementById("chatInput").value.trim();if(v==="")return;chat.push(v);localStorage.setItem("chat",JSON.stringify(chat));renderChat();document.getElementById("chatInput").value="";}
+
+// Снег
+function createSnow(){
+    const snowflake=document.createElement('div');
+    snowflake.className='snowflake';
+    const symbols=['❄','❅','❆','🎄'];
+    snowflake.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    snowflake.style.left=Math.random()*window.innerWidth+'px';
+    snowflake.style.fontSize=(Math.random()*20+10)+'px';
+    snowflake.style.animationDuration=(Math.random()*5+5)+'s, '+(Math.random()*3+2)+'s';
+    document.body.appendChild(snowflake);
+    setTimeout(()=>snowflake.remove(),12000);
+}
+setInterval(createSnow,150);
+
+// Дед Мороз летит
+let santa=document.getElementById('santa');
+let santaPos=-150;
+function moveSanta(){
+    santaPos += 2;
+    if(santaPos>window.innerWidth) santaPos=-150;
+    santa.style.left=santaPos+'px';
+    requestAnimationFrame(moveSanta);
+}
+moveSanta();
+</script>
+</body>
+</html>
